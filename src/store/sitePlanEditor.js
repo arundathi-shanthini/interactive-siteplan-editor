@@ -54,7 +54,7 @@ export default {
         selectedLayer: null,
         sitePlanMap: null,
         sitePlanImage:
-            "https://storage.googleapis.com/proudcity/sanrafaelca/uploads/2020/05/Site-plan2-scaled-e1588519997958.jpg",
+            "@/assets/top_down_image_inverted.jpg",
         existingSitePlan: null,
         mapOverlay: null,
 

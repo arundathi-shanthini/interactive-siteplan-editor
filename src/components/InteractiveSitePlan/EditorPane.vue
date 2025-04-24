@@ -33,75 +33,6 @@
                 />
             </q-expansion-item>
 
-            <div class="row nowrap">
-                <q-input
-                    v-model="plotSearch"
-                    name="plotSearch"
-                    label="Plot/Street"
-                    outlined
-                    type="text"
-                    class="q-mb-md full-width"
-                    clearable
-                >
-                    <template v-slot:prepend>
-                        <q-icon name="fas fa-search" />
-                    </template>
-                </q-input>
-            </div>
-        </div>
-        <!-- Units -->
-        <div class="unit-list">
-            <div
-                v-if="isUnitListInitializing"
-                class="row justify-center align-center"
-                :style="{ height: '100px' }"
-            >
-                Fetching Units...
-            </div>
-            <div v-else>
-                <div v-if="filteredUnits.length < 1">
-                    <div class="text-h5 text-center q-my-lg">
-                        No units available
-                    </div>
-                </div>
-                <div v-else>
-                    <DynamicScroller
-                        :items="filteredUnits"
-                        :min-item-size="200"
-                    >
-                        <template v-slot="{ item, active }">
-                            <DynamicScrollerItem
-                                :item="item"
-                                :active="active"
-                                :data-index="item.id"
-                                class="px-2"
-                            >
-                                <div class="unit q-p-xs">
-                                    <Unit :unit="item">
-                                        <div class="row justify-end q-mt-sm">
-                                            <q-btn
-                                                v-if="layer"
-                                                outline
-                                                color="primary"
-                                                @click="
-                                                    setSelectedLayerUnitId(
-                                                        item.id
-                                                    )
-                                                "
-                                            >
-                                                Assign
-                                                <i
-                                                    class="fas fa-chevron-right q-ml-sm"
-                                                ></i>
-                                            </q-btn>
-                                        </div>
-                                    </Unit>
-                                </div>
-                            </DynamicScrollerItem>
-                        </template>
-                    </DynamicScroller>
-                </div>
-            </div>
         </div>
 
         <!-- GeoJSON Import Modal -->
@@ -141,8 +72,6 @@
 
 <script>
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
-import Unit from "@/components/Unit";
-import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 import { useClipboard } from "@vueuse/core";
@@ -177,11 +106,6 @@ export default {
             addListeners,
             loadOverlayImage,
         };
-    },
-    components: {
-        DynamicScroller,
-        DynamicScrollerItem,
-        Unit,
     },
     mixins: [],
     props: {},
@@ -270,7 +194,7 @@ export default {
                 });
             } catch (error) {
                 this.notify({
-                    message: "Something went wrong with the importing.",
+                    message: error.message,
                     color: "negative",
                 });
             }
