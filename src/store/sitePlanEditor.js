@@ -1,8 +1,10 @@
 import Fuse from "fuse.js";
 import { cloneDeep, isEmpty } from "lodash";
-import { imageOverlay, LatLngBounds, LatLng } from "leaflet";
+import { imageOverlay, LatLngBounds, LatLng, geoJSON } from "leaflet";
 import { status as STATUS } from "@/enums";
 import mockUnit from "@/misc/mock_unit.json";
+import sitePlanImagePath from "@/assets/top_down_image_inverted.jpg";
+import defaultGeoJson from "@/assets/top_down_image_inverted_scaled.json"; // Import your default GeoJSON
 const collator = new Intl.Collator([], { numeric: true });
 const sortByPlot = (a, b) => collator.compare(a.plot, b.plot);
 
@@ -53,8 +55,7 @@ export default {
     state: () => ({
         selectedLayer: null,
         sitePlanMap: null,
-        sitePlanImage:
-            "@/assets/top_down_image_inverted.jpg",
+        sitePlanImage: sitePlanImagePath, // Added path to the image in assets directory
         existingSitePlan: null,
         mapOverlay: null,
 
@@ -72,6 +73,7 @@ export default {
 
         mode: "create",
         projectUnitTypeAPI: null,
+        defaultGeoJson: defaultGeoJson, // Add default GeoJSON to the state
     }),
     getters: {
         getSelectedLayer(state) {
@@ -193,6 +195,20 @@ export default {
             state.mapOverlay.addTo(state.sitePlanMap);
             let center = state.mapOverlay.getCenter();
             state.sitePlanMap.panTo(center);
+
+            // Add Default GeoJSON
+            const geoJsonLayer = geoJSON(state.defaultGeoJson, {
+                onEachFeature: (feature, layer) => {
+                    // Add listeners and styles for each feature
+                    layer.setStyle(getPolygonStyleByStatus(feature.properties.status));
+                    layer.on("click", () => {
+                        // Handle layer click
+                        state.sitePlanMap.eachLayer((l) => l.setStyle(getPolygonStyleByStatus(l.feature?.properties?.status)));
+                        layer.setStyle({ color: "#3388ff", fillOpacity: "0.8" });
+                    });
+                },
+            });
+            geoJsonLayer.addTo(state.sitePlanMap);
         },
 
         getGeoJson({ state }) {
